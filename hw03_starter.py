@@ -45,8 +45,9 @@ def p_down_given_down(returns):
 def p_down_given_big_drop(returns, threshold=-0.02):
     """P(tomorrow is down | today fell more than the threshold).
 
-    Also report how many days this is based on. Forty observations is a much
-    weaker claim than two thousand, and the count is how a reader knows.
+    Also report how many days the estimate uses. A handful of days is a much
+    weaker claim than thousands, and the count is what tells a reader which of
+    the two this is.
     """
     # TODO
     raise NotImplementedError
