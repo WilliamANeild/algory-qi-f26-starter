@@ -30,9 +30,11 @@ c.check("bond_price at its own coupon rate",
 c.check("bond_price below its coupon rate",
         lambda: m.bond_price(1000, 0.04, 10, 0.02), _bond(1000, 0.04, 10, 0.02), tol=0.02,
         note="rates down, price up")
-c.check("bond_price at today's 10-year yield",
+c.check("bond_price above its coupon rate",
         lambda: m.bond_price(1000, 0.04, 10, 0.0496), _bond(1000, 0.04, 10, 0.0496), tol=0.02,
-        note="rates up, price down")
+        note="rates up, price down. 4.96% is a fixed rate for this check, not the yield the "
+             "assignment asks for: that one is today's, so it is a different number every week and "
+             "this file cannot read it. Your function has to work at any rate.")
 c.check("bond_price with a zero coupon",
         lambda: m.bond_price(1000, 0.0, 10, 0.05), _bond(1000, 0.0, 10, 0.05), tol=0.02,
         note="just the discounted face value")
