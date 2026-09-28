@@ -35,4 +35,44 @@ c.assert_true("more trials gives a closer estimate",
                       <= abs(m.simulate_coins(400, seed=3) - 1.5) + 0.05,
               note="this is the law of large numbers, and it is the point of question 3")
 
+# ---------------------------------------------------------------- Q5/Q6
+# Hand-built return series, so every expected value below can be counted on
+# paper. No download, so these run with no network and give the same answer
+# every time. UP and DOWN are ordinary days; BIG is past the -2% threshold and
+# SMALL is a down day that must NOT count as one.
+UP, DOWN, SMALL, BIG = 0.01, -0.01, -0.005, -0.03
+
+ALTERNATING = [UP, DOWN, UP, DOWN, UP, DOWN]
+BLOCKS      = [DOWN, DOWN, DOWN, DOWN, UP, UP, UP, UP]
+ALL_DOWN    = [DOWN, DOWN, DOWN, DOWN]
+MIXED_AFTER = [BIG, UP, BIG, DOWN, UP, SMALL]
+BIG_REBOUND = [BIG, UP, DOWN, DOWN, BIG, UP]
+
+c.check("p_down on a series that alternates",
+        lambda: m.p_down(ALTERNATING), 0.5, tol=1e-9,
+        note="three of the six days are down")
+c.check("p_down when every day is down",
+        lambda: m.p_down(ALL_DOWN), 1.0, tol=1e-9,
+        note="all four days are down, so the answer is 1, not 0")
+
+c.check("p_down_given_down when a down day never follows a down day",
+        lambda: m.p_down_given_down(ALTERNATING), 0.0, tol=1e-9,
+        note="the series alternates, so no down day is ever followed by another. "
+             "Getting 0.5 means you returned the unconditional P(down) instead of "
+             "conditioning on the day before.")
+c.check("p_down_given_down on four down days then four up",
+        lambda: m.p_down_given_down(BLOCKS), 3 / 4, tol=1e-9,
+        note="four days are down; three of them are followed by a down day and the "
+             "fourth is followed by the first up day")
+
+c.check("p_down_given_big_drop ignores drops above the threshold",
+        lambda: m.p_down_given_big_drop(MIXED_AFTER), 0.5, tol=1e-9,
+        note="only the two -3% days qualify. One is followed by an up day and one by "
+             "a down day. The -1% and -0.5% days are down days but not big drops.")
+c.check("p_down_given_big_drop is not p_down_given_down",
+        lambda: m.p_down_given_big_drop(BIG_REBOUND), 0.0, tol=1e-9,
+        note="in this series every big drop is followed by an up day, while ordinary "
+             "down days are followed by down days. p_down_given_down here is 0.5, so "
+             "getting 0.5 means the threshold is being ignored.")
+
 sys.exit(c.report())
